@@ -1,0 +1,233 @@
+#include <stdio.h>
+#include <locale.h>
+#include <math.h>
+#include <conio.h>
+
+float b_one(char* b_1);
+float b_two(char* b_2);
+
+float f_Y(float);
+float f_V(float);
+
+typedef float (*TFunc)(float);
+
+void plot(double x0, double x1, TFunc f);
+
+int main() {
+    float x, y;
+    float x_1, x_2, h, y_function = 0.;
+    char b_1, b_2;
+    int button;
+
+    setlocale(LC_ALL, "RUS");
+
+    int cycle = 1;
+    while (cycle) {
+        system("cls");
+        printf("1 - значение F1\n");
+        printf("2 - значение F2\n");
+        printf("3 - значение F1 на интервале Xn, Xk\n");
+        printf("4 - значение F2 на интервале Xn, Xk\n");
+        printf("5 - построить график выбранной функции\n");
+        printf("6 - выход\n");
+        printf("\n");
+        printf("Выберете из списка нужное действие:\n");
+        scanf("%d", &button);
+        switch (button) {
+        case 1: printf("Введите аргумент х\n");
+            scanf("%f", &x);
+            y = f_Y(x);
+            printf("Значение f(x) = %f\n", y);
+            system("pause");
+            break;
+        case 2: printf("Введите аргумент х\n");
+            scanf("%f", &x);
+            y = f_V(x);
+            printf("Значение f(x) = %f\n", y);
+            system("pause");
+            break;
+        case 3: printf("Введите границы и аргументы через enter\n");
+            scanf("%c", &b_1);
+            scanf("%c", &b_1);
+
+            scanf("%f%f", &x_1, &x_2);
+
+            scanf("%c", &border_2);
+            scanf("%c", &border_2);
+
+            printf("Введите шаг h:\n");
+            scanf("%f", &h);
+
+            x_1 += border_one(&b_1);
+            x_2 += border_two(&b_2);
+
+            for (float x = x_1; x < x_2; x += h) {
+                y_function = f_Y(x);
+                printf("|%6f|%6f|\n", x, y_function);
+            }
+            system("pause");
+            break;
+        case 4: printf("Введите границы и аргументы через enter\n");
+            scanf("%c", &b_1);
+            scanf("%c", &b_1);
+
+            scanf("%f%f", &x_1, &x_2);
+
+            scanf("%c", &b_2);
+            scanf("%c", &b_2);
+
+            printf("Введите шаг h:\n");
+            scanf("%f", &h);
+
+            x_1 += b_one(&b_1);
+            x_2 += b_two(&b_2);
+
+            for (float x = x_1; x < x_2; x += h) {
+                y_function = f_V(x);
+                printf("|%6f|%6f|\n", x, y_function);
+            }
+            system("pause");
+            break;
+        case 5:
+            printf("1 - построить график функции F1\n");
+            printf("2 - построить график функции F2\n");
+            scanf("%d", &button);
+            switch (button) {
+            case 1: printf("график F1\n");
+                printf("Введите интервал\n");
+                scanf("%f%f", &x_1, &x_2);
+                plot(x_1, x_2, f_Y);
+                break;
+            case 2: printf("график F2\n");
+                printf("Введите интервал\n");
+                scanf("%f%f", &x_1, &x_2);
+                plot(x_1, x_2, f_V);
+                break;
+            }
+            system("pause");
+            break;
+        default: 
+            cycle = 0;
+            break;
+        }
+    }
+    return 0;
+}
+
+
+float f_Y(float x) {
+    float y_function = 0.;
+    if (pow(x, 2) > 0) {
+    y_function = log(pow(x, 2)) + x + 4;
+    }
+    else printf("Аргумент находится вне ОДЗ\n");
+    return y_function;
+}
+
+float f_V(float x) {
+    float y_function = 0.;
+    if (x >= 2.5) {
+        y_function = x - 2;
+    }
+    if (-1 < x < 2.5) {
+        y_function = 1 + pow(x, 2);
+    }
+    if (x <= -1) {
+        y_function = x * log(cos(x));
+    }
+    return y_function;
+}
+
+
+
+float b_one(char* b_1) {
+    if (*b_1 == '(') {
+        return 1;
+    }
+    if (*b_1 == '[') {
+        return 0;
+    }
+}
+
+float b_two(char* b_2) {
+    if (*b_2 == ')') {
+        return 0;
+    }
+    if (*b_2 == ']') {
+        return 1;
+    }
+}
+
+void plot(double x0, double x1, TFunc f)
+
+{
+
+    int SCREENW = 60, SCREENH = 40;//размеры поля вывода в символах
+
+    char screen[60][40];
+
+    double x, y[60];
+
+    double ymin = 0, ymax = 0;
+
+    double hx, hy;
+
+    int i, j;
+
+    int xz, yz;
+
+    hx = (x1 - x0) / (SCREENW - 1);
+
+    for (i = 0, x = x0; i < SCREENW; ++i, x += hx) {
+
+        y[i] = f(x); //расчет значений функции для каждой точки поля вывода графика
+
+        if (y[i] < ymin) ymin = y[i];
+
+        if (y[i] > ymax) ymax = y[i];
+
+    }
+
+    hy = (ymax - ymin) / (SCREENH - 1);
+
+    yz = (int)floor(ymax / hy + 0.5);
+
+    xz = (int)floor((0. - x0) / hx + 0.5);
+
+    //построение осей и заполнение массива отображения пробелами
+
+    for (j = 0; j < SCREENH; ++j)
+
+        for (i = 0; i < SCREENW; ++i) {
+
+            if (j == yz && i == xz) screen[i][j] = '+';
+
+            else if (j == yz) screen[i][j] = '-';
+
+            else if (i == xz) screen[i][j] = '|';
+
+            else screen[i][j] = ' ';
+
+        }
+
+    //определение положения значения функции на поле вывода
+
+    for (i = 0; i < SCREENW; ++i) {
+
+        j = (int)floor((ymax - y[i]) / hy + 0.5);
+
+        screen[i][j] = '*';
+
+    }
+
+    //печать массива символов
+
+    for (j = 0; j < SCREENH; ++j) {
+
+        for (i = 0; i < SCREENW; ++i)  putchar(screen[i][j]);
+
+        putchar('\n');
+
+    }
+
+}
